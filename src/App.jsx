@@ -23,6 +23,8 @@ export default function App() {
   ]);
   const [wrongMichael, setWrongMichael] = useState({ x: 1200, y: 200, width: 24, height: 40, active: false });
   const [isJumping, setIsJumping] = useState(false);
+  const [playerAnimation, setPlayerAnimation] = useState('idle');
+  const [wrongMichaelAnimation, setWrongMichaelAnimation] = useState('idle');
   const keysPressed = useRef({});
   const gameLoopRef = useRef(null);
   const touchStateRef = useRef({ left: false, right: false, jump: false });
@@ -99,6 +101,16 @@ export default function App() {
         if ((keysPressed.current[' '] || keysPressed.current['w'] || keysPressed.current['arrowup'] || touchStateRef.current.jump) && !isJumping && newPos.y >= GROUND_Y - 5) {
           newVel.y = JUMP_STRENGTH;
           setIsJumping(true);
+          setPlayerAnimation('jumping');
+        }
+
+        // Update animation based on movement
+        if (!isJumping) {
+          if (newVel.x !== 0) {
+            setPlayerAnimation('walking');
+          } else {
+            setPlayerAnimation('idle');
+          }
         }
 
         newPos.x += newVel.x;
@@ -258,13 +270,13 @@ export default function App() {
 
             {wrongMichael.active && (
               <div
-                className="wrong-michael"
+                className={`wrong-michael ${wrongMichaelAnimation}`}
                 style={{ left: `${wrongMichael.x}px`, top: `${wrongMichael.y}px` }}
               ></div>
             )}
 
             <div
-              className="player"
+              className={`player ${playerAnimation}`}
               style={{ left: `${playerPos.x}px`, top: `${playerPos.y}px` }}
             ></div>
           </div>
