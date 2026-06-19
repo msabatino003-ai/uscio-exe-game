@@ -23,6 +23,7 @@ export default function App() {
   const [isJumping, setIsJumping] = useState(false);
   const keysPressed = useRef({});
   const gameLoopRef = useRef(null);
+  const touchStateRef = useRef({ left: false, right: false, jump: false });
 
   const GRAVITY = 0.6;
   const JUMP_STRENGTH = -12;
@@ -44,12 +45,35 @@ export default function App() {
       keysPressed.current[e.key.toLowerCase()] = false;
     };
 
+    const handleTouchStart = (e) => {
+      if (gameState !== 'playing') return;
+      const touch = e.touches[0];
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      
+      if (touch.clientX < screenWidth / 3) {
+        touchStateRef.current.left = true;
+      } else if (touch.clientX > (screenWidth * 2) / 3) {
+        touchStateRef.current.right = true;
+      } else {
+        touchStateRef.current.jump = true;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      touchStateRef.current = { left: false, right: false, jump: false };
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchend', handleTouchEnd);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [gameState]);
 
@@ -62,9 +86,9 @@ export default function App() {
         let newPos = { ...prev };
 
         // Movimento orizzontale
-        if (keysPressed.current['a'] || keysPressed.current['arrowleft']) {
+        if (keysPressed.current['a'] || keysPressed.current['arrowleft'] || touchStateRef.current.left) {
           newVel.x = -5;
-        } else if (keysPressed.current['d'] || keysPressed.current['arrowright']) {
+        } else if (keysPressed.current['d'] || keysPressed.current['arrowright'] || touchStateRef.current.right) {
           newVel.x = 5;
         } else {
           newVel.x = 0;
@@ -74,7 +98,7 @@ export default function App() {
         newVel.y += GRAVITY;
 
         // Salto
-        if ((keysPressed.current[' '] || keysPressed.current['w'] || keysPressed.current['arrowup']) && !isJumping && newPos.y >= GROUND_Y - 5) {
+        if ((keysPressed.current[' '] || keysPressed.current['w'] || keysPressed.current['arrowup'] || touchStateRef.current.jump) && !isJumping && newPos.y >= GROUND_Y - 5) {
           newVel.y = JUMP_STRENGTH;
           setIsJumping(true);
         }
@@ -224,6 +248,13 @@ export default function App() {
             <div className="letters-collected">
               Lettere: {collectedLetters.length}/6 - {collectedLetters.map((id) => letters.find((l) => l.id === id)?.letter).join('')}
             </div>
+          </div>
+
+          {/* Touch Controls */}
+          <div className="touch-controls">
+            <div className="touch-zone touch-left">SINISTRA</div>
+            <div className="touch-zone touch-center">SALTA</div>
+            <div className="touch-zone touch-right">DESTRA</div>
           </div>
         </div>
       )}
