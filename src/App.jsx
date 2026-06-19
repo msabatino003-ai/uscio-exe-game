@@ -1,0 +1,254 @@
+import { useState, useEffect, useRef } from 'react';
+import './App.css';
+
+export default function App() {
+  const [gameState, setGameState] = useState('start'); // start, playing, gameOver, won
+  const [playerPos, setPlayerPos] = useState({ x: 400, y: 300 });
+  const [playerVelocity, setPlayerVelocity] = useState({ x: 0, y: 0 });
+  const [hp, setHp] = useState(5);
+  const [collectedLetters, setCollectedLetters] = useState([]);
+  const [enemies, setEnemies] = useState([
+    { id: 1, x: 600, y: 200, type: 'shadow', width: 40, height: 60 },
+    { id: 2, x: 200, y: 400, type: 'shepherd', width: 60, height: 40 }
+  ]);
+  const [letters, setLetters] = useState([
+    { id: 1, letter: 'M', x: 150, y: 150 },
+    { id: 2, letter: 'I', x: 300, y: 250 },
+    { id: 3, letter: 'C', x: 500, y: 100 },
+    { id: 4, letter: 'H', x: 700, y: 350 },
+    { id: 5, letter: 'A', x: 250, y: 450 },
+    { id: 6, letter: 'E', x: 650, y: 450 }
+  ]);
+  const [wrongMichael, setWrongMichael] = useState({ x: 800, y: 200, width: 40, height: 60, health: 3 });
+  const [isJumping, setIsJumping] = useState(false);
+  const keysPressed = useRef({});
+  const gameLoopRef = useRef(null);
+
+  const GRAVITY = 0.6;
+  const JUMP_STRENGTH = -12;
+  const PLAYER_WIDTH = 32;
+  const PLAYER_HEIGHT = 48;
+  const GROUND_Y = 450;
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      keysPressed.current[e.key.toLowerCase()] = true;
+      if (e.key === 'x' || e.key === 'X') {
+        if (gameState === 'start') {
+          setGameState('playing');
+        }
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      keysPressed.current[e.key.toLowerCase()] = false;
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [gameState]);
+
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+
+    gameLoopRef.current = setInterval(() => {
+      setPlayerPos((prev) => {
+        let newVel = { ...playerVelocity };
+        let newPos = { ...prev };
+
+        // Movimento orizzontale
+        if (keysPressed.current['a'] || keysPressed.current['arrowleft']) {
+          newVel.x = -5;
+        } else if (keysPressed.current['d'] || keysPressed.current['arrowright']) {
+          newVel.x = 5;
+        } else {
+          newVel.x = 0;
+        }
+
+        // Gravità
+        newVel.y += GRAVITY;
+
+        // Salto
+        if ((keysPressed.current[' '] || keysPressed.current['w'] || keysPressed.current['arrowup']) && !isJumping && newPos.y >= GROUND_Y - 5) {
+          newVel.y = JUMP_STRENGTH;
+          setIsJumping(true);
+        }
+
+        newPos.x += newVel.x;
+        newPos.y += newVel.y;
+
+        // Collisione con il terreno
+        if (newPos.y >= GROUND_Y) {
+          newPos.y = GROUND_Y;
+          newVel.y = 0;
+          setIsJumping(false);
+        }
+
+        // Limiti dello schermo
+        if (newPos.x < 0) newPos.x = 0;
+        if (newPos.x + PLAYER_WIDTH > 1024) newPos.x = 1024 - PLAYER_WIDTH;
+
+        setPlayerVelocity(newVel);
+        return newPos;
+      });
+    }, 30);
+
+    return () => clearInterval(gameLoopRef.current);
+  }, [gameState, isJumping, playerVelocity]);
+
+  // Raccolta lettere
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+
+    letters.forEach((letter) => {
+      if (!collectedLetters.includes(letter.id)) {
+        const distance = Math.hypot(playerPos.x - letter.x, playerPos.y - letter.y);
+        if (distance < 40) {
+          setCollectedLetters([...collectedLetters, letter.id]);
+        }
+      }
+    });
+  }, [playerPos, collectedLetters, letters, gameState]);
+
+  // Collisioni con nemici
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+
+    enemies.forEach((enemy) => {
+      const distance = Math.hypot(playerPos.x - enemy.x, playerPos.y - enemy.y);
+      if (distance < 50) {
+        setHp((prev) => {
+          const newHp = prev - 0.5;
+          if (newHp <= 0) {
+            setGameState('gameOver');
+          }
+          return Math.max(0, newHp);
+        });
+      }
+    });
+  }, [playerPos, enemies, gameState]);
+
+  // Movimento nemici
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+
+    const enemyInterval = setInterval(() => {
+      setEnemies((prev) =>
+        prev.map((enemy) => {
+          let newX = enemy.x;
+          const distance = Math.abs(playerPos.x - enemy.x);
+          if (distance < 300) {
+            newX += playerPos.x > enemy.x ? 2 : -2;
+          }
+          return { ...enemy, x: Math.max(0, Math.min(1024, newX)) };
+        })
+      );
+    }, 50);
+
+    return () => clearInterval(enemyInterval);
+  }, [gameState, playerPos]);
+
+  // Vittoria
+  useEffect(() => {
+    if (collectedLetters.length === 6 && gameState === 'playing') {
+      setGameState('won');
+    }
+  }, [collectedLetters, gameState]);
+
+  const handleRestart = () => {
+    setGameState('start');
+    setPlayerPos({ x: 400, y: 300 });
+    setPlayerVelocity({ x: 0, y: 0 });
+    setHp(5);
+    setCollectedLetters([]);
+    setIsJumping(false);
+  };
+
+  return (
+    <div className="game-container">
+      {gameState === 'start' && (
+        <div className="screen start-screen">
+          <div className="terminal-text">
+            <h1>uscio.exe</h1>
+            <p className="glitch-text">INSERIRE ANIMA</p>
+            <p className="instruction">Premi X per continuare...</p>
+          </div>
+        </div>
+      )}
+
+      {gameState === 'playing' && (
+        <div className="screen game-screen">
+          <div className="game-viewport">
+            <div className="background"></div>
+            
+            {/* Lettere */}
+            {letters.map((letter) =>
+              !collectedLetters.includes(letter.id) ? (
+                <div
+                  key={letter.id}
+                  className="letter"
+                  style={{ left: `${letter.x}px`, top: `${letter.y}px` }}
+                >
+                  {letter.letter}
+                </div>
+              ) : null
+            )}
+
+            {/* Nemici */}
+            {enemies.map((enemy) => (
+              <div
+                key={enemy.id}
+                className={`enemy ${enemy.type}`}
+                style={{ left: `${enemy.x}px`, top: `${enemy.y}px` }}
+              ></div>
+            ))}
+
+            {/* Giocatore */}
+            <div
+              className="player"
+              style={{ left: `${playerPos.x}px`, top: `${playerPos.y}px` }}
+            ></div>
+          </div>
+
+          {/* HUD */}
+          <div className="hud">
+            <div className="hp-bar">
+              <div className="hp-fill" style={{ width: `${(hp / 5) * 100}%` }}></div>
+            </div>
+            <div className="letters-collected">
+              Lettere: {collectedLetters.length}/6 - {collectedLetters.map((id) => letters.find((l) => l.id === id)?.letter).join('')}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {gameState === 'gameOver' && (
+        <div className="screen end-screen">
+          <div className="terminal-text">
+            <h1>GAME OVER</h1>
+            <p className="glitch-text">MICHAEL È SCOMPARSO NEL WRONGVERSE...</p>
+            <button onClick={handleRestart}>Ricomincia (Premi R)</button>
+          </div>
+        </div>
+      )}
+
+      {gameState === 'won' && (
+        <div className="screen end-screen won">
+          <div className="terminal-text">
+            <h1>HAI VINTO!</h1>
+            <p className="glitch-text">MICHAEL HA RACCOLTO TUTTE LE LETTERE</p>
+            <p>Il portale si apre sulla televisione...</p>
+            <div className="portal-effect"></div>
+            <p className="glitch-text">MA QUALCOSA NON VA ANCORA...</p>
+            <button onClick={handleRestart}>Ricomincia</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

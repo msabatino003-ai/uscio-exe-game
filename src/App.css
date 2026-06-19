@@ -1,0 +1,271 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Courier New', monospace;
+  background-color: #000;
+  color: #0f0;
+  overflow: hidden;
+}
+
+.game-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+}
+
+.screen {
+  width: 1024px;
+  height: 576px;
+  position: relative;
+  background-color: #000;
+  border: 2px solid #0f0;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+/* Schermata iniziale */
+.start-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a0033 0%, #330066 100%);
+  animation: screenFlicker 0.1s infinite;
+}
+
+.terminal-text {
+  text-align: center;
+  color: #0f0;
+  text-shadow: 0 0 10px #0f0;
+}
+
+.terminal-text h1 {
+  font-size: 4rem;
+  margin-bottom: 2rem;
+  letter-spacing: 3px;
+  animation: glitchText 0.3s infinite;
+}
+
+.glitch-text {
+  font-size: 1.5rem;
+  margin: 1rem 0;
+  animation: glitchText 0.5s infinite;
+  letter-spacing: 2px;
+}
+
+.instruction {
+  font-size: 1rem;
+  margin-top: 2rem;
+  animation: blink 1s infinite;
+}
+
+@keyframes glitchText {
+  0%, 100% {
+    text-shadow: 0 0 10px #0f0;
+  }
+  50% {
+    text-shadow: 0 0 20px #f0f, 2px 2px 0 #0f0;
+  }
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes screenFlicker {
+  0% {
+    opacity: 0.98;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.98;
+  }
+}
+
+/* Schermata di gioco */
+.game-screen {
+  display: flex;
+  flex-direction: column;
+}
+
+.game-viewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: #0a0a1a;
+}
+
+.background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url('/wrongverse-bg.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.9;
+}
+
+/* Giocatore */
+.player {
+  position: absolute;
+  width: 32px;
+  height: 48px;
+  background-image: url('/michael-sprite.png');
+  background-size: 100%;
+  background-position: 0 0;
+  z-index: 10;
+}
+
+/* Nemici */
+.enemy {
+  position: absolute;
+  z-index: 5;
+}
+
+.enemy.shadow {
+  width: 40px;
+  height: 60px;
+  background-image: url('/shadow-monster.png');
+  background-size: 100%;
+}
+
+.enemy.shepherd {
+  width: 60px;
+  height: 40px;
+  background-image: url('/shepherd-goats.png');
+  background-size: 100%;
+}
+
+/* Lettere */
+.letter {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffff00;
+  text-shadow: 0 0 10px #ffff00;
+  background: rgba(255, 255, 0, 0.1);
+  border: 2px solid #ffff00;
+  animation: floatLetter 2s ease-in-out infinite;
+  z-index: 3;
+}
+
+@keyframes floatLetter {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* HUD */
+.hud {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 10px 20px;
+  border-top: 1px solid #0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #0f0;
+  font-size: 0.9rem;
+}
+
+.hp-bar {
+  width: 200px;
+  height: 20px;
+  border: 2px solid #0f0;
+  background-color: #000;
+  overflow: hidden;
+}
+
+.hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff00, #ffff00);
+  transition: width 0.2s;
+}
+
+.letters-collected {
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* Schermata di fine gioco */
+.end-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #330000 0%, #660000 100%);
+  animation: screenFlicker 0.1s infinite;
+}
+
+.end-screen.won {
+  background: linear-gradient(135deg, #003300 0%, #006600 100%);
+}
+
+.terminal-text button {
+  margin-top: 2rem;
+  padding: 10px 30px;
+  font-size: 1rem;
+  background-color: #0f0;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.terminal-text button:hover {
+  background-color: #0f0;
+  box-shadow: 0 0 20px #0f0;
+  transform: scale(1.05);
+}
+
+.portal-effect {
+  width: 200px;
+  height: 200px;
+  margin: 2rem auto;
+  border: 3px solid #0f0;
+  border-radius: 50%;
+  animation: portalPulse 1s infinite;
+  box-shadow: 0 0 30px #0f0, inset 0 0 30px #0f0;
+}
+
+@keyframes portalPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .screen {
+    width: 90vw;
+    height: 90vh;
+    max-width: 1024px;
+    max-height: 576px;
+  }
+}
