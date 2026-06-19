@@ -177,6 +177,7 @@ export default function App() {
             <h1>uscio.exe</h1>
             <p className="glitch-text">INSERIRE ANIMA</p>
             <p className="instruction">Premi X per continuare...</p>
+            <button className="start-button" onClick={() => setGameState('playing')}>X</button>
           </div>
         </div>
       )}
