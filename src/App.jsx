@@ -14,12 +14,12 @@ export default function App() {
     { id: 4, x: 100, y: 300, type: 'shepherd', width: 60, height: 40 }
   ]);
   const [letters, setLetters] = useState([
-    { id: 1, letter: 'M', x: 150, y: 150 },
-    { id: 2, letter: 'I', x: 300, y: 250 },
-    { id: 3, letter: 'C', x: 500, y: 100 },
-    { id: 4, letter: 'H', x: 700, y: 350 },
-    { id: 5, letter: 'A', x: 250, y: 450 },
-    { id: 6, letter: 'E', x: 650, y: 450 }
+    { id: 1, letter: 'M', x: 100, y: 380 },
+    { id: 2, letter: 'I', x: 250, y: 400 },
+    { id: 3, letter: 'C', x: 400, y: 350 },
+    { id: 4, letter: 'H', x: 550, y: 380 },
+    { id: 5, letter: 'A', x: 700, y: 400 },
+    { id: 6, letter: 'E', x: 850, y: 380 }
   ]);
   const [wrongMichael, setWrongMichael] = useState({ x: 1200, y: 200, width: 24, height: 40, active: false });
   const [isJumping, setIsJumping] = useState(false);

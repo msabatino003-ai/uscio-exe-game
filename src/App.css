@@ -147,13 +147,13 @@ body {
 /* Giocatore */
 .player {
   position: absolute;
-  width: 24px;
-  height: 40px;
+  width: 28px;
+  height: 44px;
   z-index: 10;
-  background: linear-gradient(to bottom, #90EE90 0%, #90EE90 25%, #228B22 25%, #228B22 70%, #1a1a1a 70%, #1a1a1a 100%);
-  border: 2px solid #0f0;
-  border-radius: 3px;
-  box-shadow: 0 0 15px #0f0;
+  background: linear-gradient(to bottom, #00FF00 0%, #00FF00 30%, #00CC00 30%, #00CC00 70%, #003300 70%, #003300 100%);
+  border: 3px solid #00FF00;
+  border-radius: 2px;
+  box-shadow: 0 0 20px #00FF00, 0 0 40px #00FF00, inset 0 0 10px rgba(0, 255, 0, 0.5);
 }
 
 /* Nemici */
