@@ -149,10 +149,14 @@ body {
   position: absolute;
   width: 32px;
   height: 48px;
+  background-color: #90EE90;
   background-image: url('/michael-sprite.png');
   background-size: 100%;
   background-position: 0 0;
   z-index: 10;
+  border: 2px solid #0f0;
+  border-radius: 4px;
+  box-shadow: 0 0 10px #0f0;
 }
 
 /* Nemici */
@@ -164,15 +168,21 @@ body {
 .enemy.shadow {
   width: 40px;
   height: 60px;
+  background-color: #333;
   background-image: url('/shadow-monster.png');
   background-size: 100%;
+  border: 2px solid #ff0000;
+  box-shadow: 0 0 10px #ff0000;
 }
 
 .enemy.shepherd {
   width: 60px;
   height: 40px;
+  background-color: #8B4513;
   background-image: url('/shepherd-goats.png');
   background-size: 100%;
+  border: 2px solid #ff6600;
+  box-shadow: 0 0 10px #ff6600;
 }
 
 /* Lettere */
